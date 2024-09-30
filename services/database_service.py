@@ -10,7 +10,7 @@ NOTE: This script is the property of Algebra University, Zagreb. Unauthorized us
 """
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, joinedload
 from models.city import City
 from models.weather import Weather
 
@@ -67,6 +67,8 @@ class WeatherRecord(Base):
     condition = Column(String, nullable=False)
     wind_speed = Column(Float, nullable=False)
     city_id = Column(Integer, ForeignKey('city_records.id'), nullable=False)
+    city_name = Column(String, ForeignKey('cities.name'))
+    city_country = Column(String, ForeignKey('cities.country'))
 
     city = relationship("CityRecord", back_populates="weather_records")
 
@@ -164,14 +166,20 @@ class DatabaseService:
         Returns:
             List[WeatherRecord]: A list of WeatherRecord objects for the specified city.
         """
-        session = self.Session()
+        # session = self.Session()
         try:
-            city_record = session.query(CityRecord).filter_by(name=city.name, country=city.country).first()
-            if city_record:
-                return city_record.weather_records
-            return []
+            with self.Session() as session:
+                return (
+                    session.query(WeatherRecord)
+                    .filter(
+                            WeatherRecord.city_name == city.name,
+                            WeatherRecord.city_country == city.country
+                    )
+                    .options(joinedload(WeatherRecord.city))
+                    .all()
+                )
         except Exception as e:
             print(f"Error retrieving weather records: {e}")
             return []
-        finally:
-            session.close()
+        # finally:
+        #     session.close()

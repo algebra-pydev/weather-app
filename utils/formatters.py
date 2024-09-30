@@ -58,7 +58,7 @@ def format_weather_record(record: WeatherRecord) -> str:
         str: A formatted string representing the weather record data.
     """
     return (
-        f"Weather in {record.city_name}, {record.country}:\n"
+        f"Weather in {record.city.name}, {record.city.country}:\n"
         f"  Temperature: {record.temperature}°C\n"
         f"  Humidity: {record.humidity}%\n"
         f"  Pressure: {record.pressure} hPa\n"
