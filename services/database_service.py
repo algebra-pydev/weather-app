@@ -67,8 +67,8 @@ class WeatherRecord(Base):
     condition = Column(String, nullable=False)
     wind_speed = Column(Float, nullable=False)
     city_id = Column(Integer, ForeignKey('city_records.id'), nullable=False)
-    city_name = Column(String, ForeignKey('cities.name'))
-    city_country = Column(String, ForeignKey('cities.country'))
+    city_name = Column(String, ForeignKey('city_records.name'))
+    city_country = Column(String, ForeignKey('city_records.country'))
 
     city = relationship("CityRecord", back_populates="weather_records")
 
